@@ -1,0 +1,64 @@
+Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Text("Identify crop disease",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700),),
+              ),
+              InkWell(
+                onLongPress: (){
+                  Navigator.popAndPushNamed(context,'/shopHome');
+                },
+                child: Container(
+                  height: 200,
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    // border: Border(right: BorderSide(color: Colors.black54)),
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    boxShadow: [
+                      BoxShadow(
+                      blurRadius: 2,
+                        color: Colors.black45,
+                        offset: Offset(
+                          2,
+                          2,
+                        ),
+                    )],
+                    color: Color.fromRGBO(255, 255, 255, 1.0),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(image: AssetImage('Assets/Image/Crop_Camera.png',),height: 60,),
+                              SizedBox(height: 10,),
+                              Text("Take a",style: TextStyle(color:Colors.black87),),
+                              Text("picture",style: TextStyle(color:Colors.black87),),
+                            ],
+                          ),
+                          Image(image: AssetImage('Assets/Image/right-arrow.png',),height: 30,color: Colors.black45,),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(image: AssetImage('Assets/Image/diagnosis.png',),height: 70,),
+                              SizedBox(height: 10,),
+                              Text("See",style: TextStyle(color:Colors.black87),),
+                              Text("diagnosis",style: TextStyle(color:Colors.black87),)
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      TextButton(onPressed: (){}, style: TextButton.styleFrom(backgroundColor: Color.fromRGBO(20, 79, 22,1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 30,top: 5,right: 30,bottom: 5),
+                          child: Text("TAKE A PITCURE",style: TextStyle(color: Colors.white,letterSpacing: 1),),
+                        ),),
+                    ],
+                  ),
+                ),
+              ),

@@ -5,7 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../App Theme/weatherTheme.dart';
+import 'weatherTheme.dart';
 
 
 /// ********************************* Weather Forecasting module loader ********************************
@@ -39,12 +39,13 @@ class _WeatherLoaderState extends State<WeatherLoader> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body: Center(
-        child:Container(
-            color: WeatherTheme.backgroundColor(),
-            child: Image.asset('Assets/Gif/Loading.gif',height: 100,)
-                ),
-            )
+      body: Center(child: CircularProgressIndicator(color: Color.fromRGBO(20, 79, 22,1),)),
+    // Center(
+      //   child:Container(
+      //       color: WeatherTheme.backgroundColor(),
+      //       child: Image.asset('Assets/Gif/Loading.gif',height: 100,)
+      //           ),
+      //       )
     );
   }
 }
@@ -102,39 +103,19 @@ class _Wheather_ForecastingState extends State<Wheather_Forecasting> {
               shadowColor: WeatherTheme.foregroundColor(),
               titleSpacing: 0,
               iconTheme: IconThemeData(color: WeatherTheme.backgroundColor()),
-              title: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        InkWell(
-                            onTap : (){
-                              Navigator.popAndPushNamed(context, '/home');
-                              },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.arrow_back,color: WeatherTheme.foregroundColor(),weight: 20,size: 30,),
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text("Weather Forecasting",style: TextStyle(fontSize: 20,color: WeatherTheme.foregroundColor()),),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 90),
-                          child: InkWell(
-                              onTap : (){
-                                WeatherTheme.swapColor();
-                                setState(() {});
-                              },
-                              child: Icon(Icons.sunny,color: WeatherTheme.foregroundColor(),weight: 20,size: 30)
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
+              leading: IconButton(icon: Icon(Icons.arrow_back , color: Colors.black,), onPressed: () { Navigator.popAndPushNamed(context, '/home'); },),
+
+              title:Text("Weather Forecasting",style: TextStyle(fontSize: 20,color: WeatherTheme.foregroundColor())),
+
+              actions: [
+                IconButton(
+                    onPressed: (){
+                      WeatherTheme.swapColor();
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.sunny,color: WeatherTheme.foregroundColor(),weight: 20,size: 30)
+                )
+              ],
             ),
 
             body: RefreshIndicator(

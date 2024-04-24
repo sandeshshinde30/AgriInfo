@@ -1,174 +1,428 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:agri_info/login.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'Settings/settingsTheme.dart';
 
-
-class regis extends StatefulWidget {
-
-  const regis({Key? key}) : super(key: key);
-
+class RegistrationForm extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _regisState();
-
+  RegistrationFormState createState() => RegistrationFormState();
 }
 
-class _regisState extends State<regis>{
+class RegistrationFormState extends State<RegistrationForm> {
+  final List<String> states = [    'Select State',    'Andhra Pradesh',    'Arunachal Pradesh',    'Assam',    'Bihar',    'Chhattisgarh',    'Goa',    'Gujarat',    'Haryana',    'Himachal Pradesh',    'Jharkhand',    'Karnataka',    'Kerala',    'Madhya Pradesh',    'Maharashtra',    'Manipur',    'Meghalaya',    'Mizoram',    'Nagaland',    'Odisha',    'Punjab',    'Rajasthan',    'Sikkim',    'Tamil Nadu',    'Telangana',    'Tripura',    'Uttarakhand',    'Uttar Pradesh',    'West Bengal'  ];
+  late String _selectedState = states[0];
 
-  final formKey = GlobalKey<FormState>();
-  String name = "";
-  
-  @override
-  Widget build(BuildContext context) {
-    
-    final double height = MediaQuery.of(context).size.height;
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController mob = TextEditingController();
+  String? state;
+  static String verify = "";
+  String countyCode = "+91";
+  var language;
 
-    return Scaffold(
-      
-      key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Color.fromRGBO(139, 227, 143, 1),
-       
-        title: Row(
-                children: <Widget>[
-                  // Image.asset('Assets/Image/App Logo.png',height: 40,),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        InkWell(
-                            onTap : (){
-                              Navigator.popAndPushNamed(context, '/home').then((_) => setState(() {}));
-                              },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.arrow_back),
-                            )),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text("Registration Page",style: TextStyle(color: Colors.white),),
+  String titile = "Agrinfo Registration";
+  String nameTxt = "Name";
+  String emailTxt = "Email";
+  String mobileTxt = "Mobile Number";
+  String stateTxt = "Select State";
+  String btnTxt = "Register";
+  String haveAcc = "Already have account?";
+  String login = "Login";
+  String invalidPhone = "Invalid Phone Number";
+  String alreadyReg = "Already Registered..";
+  String must10Digit = "Mobile number must be 10 digits.";
+  String emptyName = "Please Enter Name....";
+  String emptyEmail = "Please Enter Email....";
+  String emptyState = "Please Select State....";
+
+  Future setDataOnLanguage() async
+  {
+    var preflanguage = await SharedPreferences.getInstance();
+    language = preflanguage.getString('language').toString().toLowerCase();
+
+    print("Register $language");
+
+    if(language == "marathi")
+      {
+         titile = "ॲग्रीइनफो रजिस्ट्रेशन";
+         nameTxt = "नाव";
+         emailTxt = "ईमेल";
+         mobileTxt = "मोबाईल नंबर";
+         stateTxt = "राज्य निवडा";
+         btnTxt = "रजिस्टर";
+         haveAcc = "आधीपासून अकाऊंट आहे?";
+         login = "लॉगिन";
+         invalidPhone = "चुकीचा मोबाईल नंबर";
+         alreadyReg = "तुम्ही आधीपासून रजिस्टर आहात";
+         must10Digit = "मोबाईल नंबर 10 अंकी हवा आहे";
+         emptyName = "कृपया नाव टाका";
+         emptyEmail = "कृपया ईमेल टाका";
+         emptyState = "कृपया राज्य निवडा";
+         setState(() {});
+
+      }
+    if(language == "hindi")
+      {
+        titile = "ॲग्रीइनफो रजिस्ट्रेशन";
+        nameTxt = "नाम";
+        emailTxt = "ईमेल";
+        mobileTxt = "मोबाइल नंबर";
+        stateTxt = "राज्य चुनें";
+        btnTxt = "रजिस्टर";
+        haveAcc = "पहले से खाता है?";
+        login = "लॉगिन";
+        invalidPhone = "अवैध फोन नंबर";
+        alreadyReg = "पहले से ही रजिस्टर है";
+        must10Digit = "मोबाइल नंबर 10 अंकों का होना चाहिए";
+        emptyName = "कृपया नाम दर्ज करें";
+        emptyEmail = "कृपया ईमेल दर्ज करें";
+        emptyState = "कृपया राज्य का चयन करें";
+
+        setState(() {});
+      }
+  }
+
+  Future registerUser() async
+  {
+    try {
+      var url = Uri.parse("https://agrinfo.000webhostapp.com/registerCheck.php");
+
+      var response = await http.post(url, body: {
+        'mob': mob.text,
+      });
+
+      var data;
+      int Mobile = int.parse(mob.text);
+
+      if(response.body.isNotEmpty)
+        {
+          data = jsonDecode(response.body);
+        }
+
+      if(data == "true")
+        {
+          Navigator.pop(context);
+          // settingsTheme().showToast("Registration Successful...");
+
+          var prefUserProfile = await SharedPreferences.getInstance();
+          prefUserProfile.setString("UserName", name.text);
+          prefUserProfile.setString("UserMob", mob.text);
+          prefUserProfile.setString("UserEmail", email.text);
+          prefUserProfile.setString("UserState", state.toString());
+
+          {
+            showDialog(context: context, builder: (context) => Center(child: CircularProgressIndicator(color: Color.fromRGBO(20, 79, 22,1),)));
+            await FirebaseAuth.instance.verifyPhoneNumber(
+              phoneNumber: '${countyCode + mob.text}',
+              verificationCompleted: (PhoneAuthCredential credential) {},
+              verificationFailed: (FirebaseAuthException e) {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Error'),
+                      content: Text('$invalidPhone'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('OK'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
                         ),
                       ],
+                    );
+                  },
+                );
+              },
+              codeSent: (String verificationId, int? resendToken) {
+                Navigator.of(context).pop();
+                RegistrationFormState.verify = verificationId;
+                Navigator.pushReplacementNamed(context, '/regOtp');
+              },
+              codeAutoRetrievalTimeout: (String verificationId) {
+                Navigator.of(context).pop();
+              },
+            );
+          }
+
+        }
+      if(data == "false")
+        {
+          Navigator.pop(context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('$alreadyReg'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                  )
-                ],
-              ),
-      ),
-      backgroundColor: Colors.white,
+                  ],
+                );
+              }
+          );
+        }
+      // if(data == "false")
+      //   {
+      //     Navigator.pop(context);
+      //     showDialog(
+      //         context: context,
+      //         builder: (BuildContext context) {
+      //           return AlertDialog(
+      //             title: Text('Error'),
+      //             content: Text('Registration Failed..'),
+      //             actions: <Widget>[
+      //               TextButton(
+      //                 child: Text('OK'),
+      //                 onPressed: () {
+      //                   Navigator.of(context).pop();
+      //                 },
+      //               ),
+      //             ],
+      //           );
+      //         }
+      //     );
+      //   }
+    }
+    catch(e)
+    {
+      Navigator.pop(context);
+      settingsTheme().showToast("Error : Registration Failed...");
+      print("Error in registering user");
+      print(e);
+    }
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    setDataOnLanguage();
+    super.initState();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+
+      // appBar: AppBar(
+      //   title: Text('AgriInfo Registration'),
+      //   backgroundColor: Colors.white,
+      //   foregroundColor: Colors.black,
+      // ),
       body: SingleChildScrollView(
         child: Container(
-        //       decoration: const BoxDecoration(
-        //   image: DecorationImage(
-        //       image: AssetImage("assets/img/back.jpg"),
-        //       fit: BoxFit.cover),
-        // ),
-          padding: const EdgeInsets.only(left: 40, right: 40),
-          child: Form( //for form validation 
-            key: formKey, //for form validation
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              SizedBox(height: 30.0),
+              Text(
+                '$titile',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[400],
+                ),
+              ),
+              SizedBox(height: 10.0),
+              Image.asset(
+                'Assets/Image/Agrinfo_SignUp.png',
+                height: 265.0,
+                width: 265.0,
+              ),
+              SizedBox(height: 20.0),
+              TextFormField(
+                keyboardType: TextInputType.name,
+                controller: name,
+                decoration: InputDecoration(
+                  labelText: '$nameTxt',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  prefixIcon: Icon(Icons.person),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              TextFormField(
+                controller: email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: '$emailTxt',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  prefixIcon: Icon(Icons.email),
+                ),
+              ),
+              SizedBox(height: 10.0),
+              TextFormField(
+                maxLength: 10,
+                controller: mob,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                    labelText: '$mobileTxt',
+                    prefixText: '+91 ',
+                    counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  prefixIcon: Icon(Icons.phone),
+
+                ),
+              ),
+              SizedBox(height: 10.0),
+              DropdownButtonFormField<String>(
+                value: _selectedState,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedState = newValue!;
+                    state = newValue;
+                  });
+                },
+                items: states.map((state) {
+                  return DropdownMenuItem<String>(
+                    value: state,
+                    child: Text(state),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: '$stateTxt',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  prefixIcon: Icon(Icons.location_city),
+                ),
+              ),
+              SizedBox(height: 40.0),
+              TextButton(onPressed: (){
+                // print(name.text + email.text + mob.text + state.toString());
+
+                if (mob.text.length < 10 || mob.text.length >10) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('$must10Digit'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                else if(name.text.isEmpty)
+                  {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text('$emptyName'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                else if(email.text.isEmpty)
+                {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('$emptyEmail'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                else if(state == null)
+                {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('$emptyState'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                else{
+                  showDialog(context: context, builder: (context) => Center(child: CircularProgressIndicator(color: Color.fromRGBO(20, 79, 22,1),)));
+                  registerUser();
+                }
+              }, style: TextButton.styleFrom(backgroundColor: Color.fromRGBO(20, 79, 22,1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20,top: 10,right: 20,bottom: 10),
+                    child: Text("$btnTxt > ",style: TextStyle(color: Colors.white,letterSpacing: 1),),
+      ),),
+              SizedBox(height: 20.0),
+          TextButton(
+            onPressed: () {
+            // Navigate to the login page when the button is pressed
+            Navigator.pushReplacementNamed(context, '/lgn');
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: height*0.12,),
-                Text("Login Here !!", style: TextStyle(fontSize: 30, color: Colors.amber),),
-                // Text("Hello", style: TextStyle(fontSize: 30),),
-                SizedBox(height: height*0.06,),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Enter Your Name",
-                  ),
-      
-                  // ********************************Validation************************************
-                  validator: (value) {
-                    if(value!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(value)){
-                        return "Please Enter Valid Name";
-                    }
-                    else{
-                      return null;
-                    }
-                  },
+                Text(
+                  '$haveAcc',
+                  style: TextStyle(
+                      color: Colors.black,fontSize: 17),
                 ),
-      
-                SizedBox(height: height*0.06,),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Enter Your Password",
-                  ),
-                  
-                  // ********************************Validation************************************
-                  validator: (value) {
-                    if(value!.isEmpty || !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$').hasMatch(value)){
-                        return "Please Enter Valid Password";
-                    }
-                    else{
-                      return null;
-                    }
-                  },
+                Text(
+                  ' $login',
+                  style: TextStyle(
+                      color: Colors.green,fontSize: 17),
                 ),
-      
-                SizedBox(height: height*0.06,),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Enter Your Email",
-                  ),
-      
-                  // ********************************Validation************************************
-                  validator: (value) {
-                    if(value!.isEmpty || !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)){
-                        return "Please Enter Valid Email";
-                    }
-                    else{
-                      return null;
-                    }
-                  },
-                ),
-      
-                SizedBox(height: height*0.06,),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Enter Your Mobile Number",
-                  ),
-      
-                  // ********************************Validation************************************
-                  validator: (value) {
-                    if(value!.isEmpty || !RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$').hasMatch(value)){
-                        return "Please Enter Valid Mobile Number";
-                    }
-                    else{
-                      return null;
-                    }
-                  },
-                ),
-      
-                
-                SizedBox(height: height*0.09,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    
-                    Center(
-                      child: ElevatedButton(
-                        child: Text("Submit"),
-                        onPressed: (){
-                        if(formKey.currentState!.validate()){
-                          final snackBar = SnackBar(content: Text('Succesful'));
-                          // _scaffoldKey.currentState!.showSnackBar(snackBar);
-                        }
-                      },
-                      onLongPress: (){
-                        print("Long Pressed");
-                      },
-                      ),
-                    )
-                  ],
-                )
               ],
-            ), 
-            ),
+            )
           ),
+            ],
+          ),
+        ),
       ),
     );
   }
-
-  
-} 
-
+}

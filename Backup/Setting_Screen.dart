@@ -1,6 +1,5 @@
 import 'package:agri_info/App%20Theme/app%20theme.dart';
 import 'package:flutter/material.dart';
-import '../lib/Home_Screen.dart';
 import 'Search_Screen.dart';
 
 class Settings extends StatefulWidget {
