@@ -24,15 +24,17 @@ class _WeatherLoaderState extends State<WeatherLoader> {
     var pref = await SharedPreferences.getInstance();
     /// If user denied location permission then default location will be Mumbai
     var location = pref.getString('userLocation') ?? "Mumbai";
+    print("Location : $location");
 
     weatherAPI objAPI = weatherAPI(location: location);
     await objAPI.getAPIData();
+    print(objAPI);
   }
 
   @override
   void initState() {
     super.initState();
-    getLocation(context);
+    // getLocation(context);
     getApiData();
   }
 
@@ -296,7 +298,7 @@ class _Wheather_ForecastingState extends State<Wheather_Forecasting> {
     Condition = condition ?? "no value get from preferances";
     WindSpeed = windKPH ?? "no value get from preferances";
     Humidity = humidity ?? "no value get from preferances";
-    UVRays = UVrays!  ;
+    UVRays = UVrays ?? 3;
     Pressure = pressure ?? "no value get from preferances";
     Visibility = visibility ?? "no value get from preferances";
     Dewpoint = dewPoint ?? "no value get from preferances";
@@ -380,7 +382,6 @@ void getLocation(BuildContext context) async
     /// *************Storing user location in shared preferances *************///
     var preflocation = await SharedPreferences.getInstance();
     preflocation.setString('userLocation', location.toString());
-
   }
 }
 
@@ -406,7 +407,7 @@ Future<Object> determinePosition(BuildContext context) async {
     return Future.error("Location Service permenentaly denied");
   }
 
-  Timer(Duration(seconds:3),
-          ()=>Navigator.pushReplacementNamed(context, '/weather_forecast'));
+  // Timer(Duration(seconds:3),
+  //         ()=>Navigator.pushReplacementNamed(context, '/weather_forecast'));
   return await Geolocator.getCurrentPosition();
 }

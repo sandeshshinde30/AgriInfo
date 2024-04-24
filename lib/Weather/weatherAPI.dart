@@ -36,7 +36,7 @@ class weatherAPI
   Future<void>getAPIData() async
   {
     try{
-      Response response = await get(Uri.parse("https://api.weatherapi.com/v1/forecast.json?key=2fc731245981496daa1100915231505&q=$location&days=7&aqi=no&alerts=no"));
+      Response response = await get(Uri.parse("https://api.weatherapi.com/v1/forecast.json?key=706eff95eebd4e3c85c54615242404&q=$location&days=7&aqi=no&alerts=no"));
       Map APIdata = jsonDecode(response.body);
 
       Location = location;
@@ -105,8 +105,6 @@ class weatherAPI
       prefData.setInt('isRain',isRain);
 
       print("Api Called..");
-
-
 
     }
     catch(e)

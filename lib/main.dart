@@ -47,7 +47,7 @@ void main() async
       GetMaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-          '/' : (BuildContextcontext) => LanguageSelectionPage(),
+          '/' : (BuildContextcontext) => Loader(),
           '/langSelect' : (BuildContextcontext) => LanguageSelectionPage(),
           '/lgn' : (BuildContextcontext) => LoginPage(),
           '/signup' : (BuildContextcontext) => RegistrationForm(),
@@ -124,13 +124,13 @@ class _LoaderState extends State<Loader> {
     loginOrNot = prefCheckLogin.getBool("LoginString");
     print("home boolean $loginOrNot");
 
-    if (loginOrNot == null || !loginOrNot) {
-      Timer(Duration(seconds: 2), () => Navigator.pushNamed(context, '/langSelect'));
-      print("$loginOrNot lang select");
-    } else {
+     if (loginOrNot == null || !loginOrNot) {
+       Timer(Duration(seconds: 2), () => Navigator.pushNamed(context, '/langSelect'));
+       print("$loginOrNot lang select");
+     } else {
       Timer(Duration(seconds: 2), () => Navigator.pushNamed(context, '/home'));
       print("$loginOrNot home");
-    }
+     }
   }
 
   @override
