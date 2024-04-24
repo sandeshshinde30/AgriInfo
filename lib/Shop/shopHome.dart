@@ -508,8 +508,7 @@ class _shopHomeState extends State<shopHome> {
                                           context, '/allProductsSpinner');
                                     },
                                       icon: Image.asset(
-                                        'Assets/Image/menu.png',),
-                                      iconSize: 55,),
+                                        'Assets/Image/menu.png',width: 80,)),
                                     Text("$categoriesAllProduct",
                                       style: TextStyle(fontSize: 15,
                                           fontWeight: FontWeight.bold),)
@@ -523,8 +522,8 @@ class _shopHomeState extends State<shopHome> {
                                       //     context, '/cropTonics',arguments: language);
                                     },
                                       icon: Image.asset(
-                                        'Assets/Image/crop tonics.png',),
-                                      iconSize: 55,),
+                                        'Assets/Image/crop tonics.png',width: 80,),
+                                      iconSize: 10,),
                                     Text("$categoriesCropTonics",
                                       style: TextStyle(fontSize: 15,
                                           fontWeight: FontWeight.bold),)
@@ -538,8 +537,8 @@ class _shopHomeState extends State<shopHome> {
                                       //     context, '/cropFertilizer');
                                     },
                                       icon: Image.asset(
-                                        'Assets/Image/fertilizer.png',),
-                                      iconSize: 55,),
+                                        'Assets/Image/fertilizer.png',width: 80,),
+                                      iconSize: 10,),
                                     Text("$categoriesFertilizer",
                                       style: TextStyle(fontSize: 15,
                                           fontWeight: FontWeight.bold),)
